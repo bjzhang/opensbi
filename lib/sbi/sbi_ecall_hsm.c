@@ -41,6 +41,9 @@ static int sbi_ecall_hsm_handler(unsigned long extid, unsigned long funcid,
 						regs->a0);
 		ret = sbi_hsm_hart_state_to_status(hstate);
 		break;
+	case SBI_EXT_HSM_HART_STOP_REMOTE:
+		ret = sbi_hsm_hart_stop_remote(scratch, regs->a0);
+		break;
 	default:
 		ret = SBI_ENOTSUPP;
 	};

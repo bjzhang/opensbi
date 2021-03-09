@@ -11,6 +11,7 @@
 #include <sbi/sbi_console.h>
 #include <sbi/sbi_platform.h>
 #include <sbi/sbi_scratch.h>
+#include <sbi/sbi_hsm.h>	//for sbi_hsm_hart_maybe_switch_to_stopped
 
 static const struct sbi_platform *console_plat = NULL;
 static spinlock_t console_out_lock	       = SPIN_LOCK_INITIALIZER;
@@ -26,6 +27,7 @@ bool sbi_isprintable(char c)
 
 int sbi_getc(void)
 {
+	sbi_hsm_hart_maybe_switch_to_stopped();
 	return sbi_platform_console_getc(console_plat);
 }
 
@@ -34,6 +36,7 @@ void sbi_putc(char ch)
 	if (ch == '\n')
 		sbi_platform_console_putc(console_plat, '\r');
 	sbi_platform_console_putc(console_plat, ch);
+	sbi_hsm_hart_maybe_switch_to_stopped();
 }
 
 void sbi_puts(const char *str)

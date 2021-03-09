@@ -289,3 +289,39 @@ int sbi_hsm_hart_stop(struct sbi_scratch *scratch, bool exitnow)
 
 	return 0;
 }
+
+int sbi_hsm_hart_stop_remote(struct sbi_scratch *scratch, u32 hartid)
+{
+	struct sbi_scratch *rscratch;
+	struct sbi_hsm_data *hdata;
+	u32 hstate;
+
+	rscratch = sbi_hartid_to_scratch(hartid);
+	if (!rscratch)
+		return SBI_EINVAL;
+
+	hdata = sbi_scratch_offset_ptr(rscratch, hart_data_offset);
+	hstate = atomic_xchg(&hdata->state, SBI_HART_STOPPING);
+	if (hstate != SBI_HART_STARTED && hstate != SBI_HART_STOPPING \
+			&& hstate != SBI_HART_STOPPED)
+		sbi_printf("WARNING: unexpect state: %d\n", hstate);
+
+	return 0;
+}
+
+void sbi_hsm_hart_maybe_switch_to_stopped(void)
+{
+	u32 hartid = current_hartid();
+	struct sbi_scratch *scratch;
+	struct sbi_hsm_data *hdata;
+	u32 hstate;
+
+	scratch = sbi_hartid_to_scratch(hartid);
+	if (!scratch)
+		return;
+
+	hdata = sbi_scratch_offset_ptr(scratch, hart_data_offset);
+	hstate = atomic_read(&hdata->state);
+	if (SBI_HART_STOPPING == hstate)
+		sbi_exit(scratch);
+}

@@ -29,6 +29,8 @@ int sbi_hsm_hart_start(struct sbi_scratch *scratch,
 		       const struct sbi_domain *dom,
 		       u32 hartid, ulong saddr, ulong smode, ulong priv);
 int sbi_hsm_hart_stop(struct sbi_scratch *scratch, bool exitnow);
+int sbi_hsm_hart_stop_remote(struct sbi_scratch *scratch, u32 hartid);
+void sbi_hsm_hart_maybe_switch_to_stopped(void);
 int sbi_hsm_hart_get_state(const struct sbi_domain *dom, u32 hartid);
 int sbi_hsm_hart_state_to_status(int state);
 int sbi_hsm_hart_started_mask(const struct sbi_domain *dom,
